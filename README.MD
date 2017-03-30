@@ -1,5 +1,14 @@
-# Testes com o PHP Unit
-.\vendor\bin\phpunit --bootstrap vendor/autoload.php AvaliadorTest
+# How to Install:  
 
-Com :
-.\vendor\bin\phpunit
+
+```
+cd THIS_PROJECT_FOLDER  
+composer update  
+.\vendor\bin\phpunit  
+```
+
+
+
+Obs: Caso tenha mais classes, pode alterar o config.php 
+
+
