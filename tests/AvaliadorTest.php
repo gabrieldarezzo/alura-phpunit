@@ -27,6 +27,7 @@ class AvaliadorTest extends PHPUnit_Framework_TestCase{
 		// $this->assertEquals($leiloeiro->getMaiorLance(), $maiorEsperado);
 		// $this->assertEquals($leiloeiro->getMenorLance(), $menorEsperado);
 		$this->assertEquals($leiloeiro->valorMedio($leilao), 5);
+		// $this->assertEquals($leiloeiro->valorMedio($leilao), 6);
 	}
 	
 	
