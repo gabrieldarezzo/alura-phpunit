@@ -1,212 +1,246 @@
 <?php
 
-// require_once 'config.php';
+class AvaliadorTest extends PHPUnit_Framework_TestCase
+{
+   
 
-
-class AvaliadorTest extends PHPUnit_Framework_TestCase{	
-	
-	public function testValorMedio(){
-		
-		$leilao = new Leilao('Playstation 4');
-
-		$renam 	= new Usuario('Renam');
-		$caio 	= new Usuario('Caio');
-		$felipe = new Usuario('Felipe');
-	
-	
-		$leilao->propoe(new Lance($renam, 5));
-		$leilao->propoe(new Lance($caio, 5));
-		$leilao->propoe(new Lance($felipe, 5));
-
-		$leiloeiro = new Avaliador();
-
-		$valorMedio = 5;
-		$this->assertEquals($leiloeiro->valorMedio($leilao), $valorMedio);
-		
-	}
-	
-	
-	public function testAceitaApenasUmLance(){
-		
-		$leilao = new Leilao('Playstation 4');
-
-		$renam 	= new Usuario('Renam');
-		$caio 	= new Usuario('Caio');
-		$felipe = new Usuario('Felipe');
-	
-	
-		$leilao->propoe(new Lance($renam, 33));
-
-		$leiloeiro = new Avaliador();
-		$leiloeiro->avalia($leilao);
-		
-		$maiorEsperado = 33;
-		$menorEsperado = 33;
-		$this->assertEquals($leiloeiro->getMaiorLance(), $maiorEsperado);
-		$this->assertEquals($leiloeiro->getMenorLance(), $menorEsperado);
+    private $leiloeiro;
+    
+    public function SetUp()
+    {
+        $this->leiloeiro = new Avaliador();
+    }
+    
+    /*
+	public static function setUpBeforeClass() {
+	  var_dump("before class");
 	}
 
-	
-
-	public function testUltimoLance(){
-		$leilao = new Leilao('Nintendo Switch');
-
-		$renam 	= new Usuario('Renam');
-		$caio 	= new Usuario('Caio');
-
-		$leilao->propoe(new Lance($caio, 10));
-
-		$leilao->propoe(new Lance($renam, 200));
-		$ultimoLance = $leilao->getUltimoLance();
-		$this->assertEquals($ultimoLance->getValor(), 200);
-
+	public static function tearDownAfterClass() {
+	  var_dump("after class");
 	}
+	*/
+    
+    public function testValorMedio()
+    {
+        
+        $leilao = new Leilao('Playstation 4');
+
+        $renam  = new Usuario('Renam');
+        $caio   = new Usuario('Caio');
+        $felipe = new Usuario('Felipe');
+    
+		$construtor = new ConstrutorDeLeilao();
+        $leilao = $construtor->para('Playstation 4')
+            ->lance($renam, 5)
+            ->lance($caio, 5)
+            ->lance($felipe, 5)
+            ->constroi()
+        ;
+        $this->leiloeiro->avalia($leilao);
+
+        $valorMedio = 5;
+        $this->assertEquals($this->leiloeiro->valorMedio($leilao), $valorMedio);
+    }
+    
+    
+    public function testAceitaApenasUmLance()
+    {
+        
+        $renam  = new Usuario('Renam');
+        $construtor = new ConstrutorDeLeilao();
+        $leilao = $construtor->para('Playstation 4')
+            ->lance($renam, 200)
+            ->constroi()
+        ;
+        
+		$this->leiloeiro->avalia($leilao);
+        
+        $maiorEsperado = 200;
+        $menorEsperado = 200;
+        $this->assertEquals($this->leiloeiro->getMaiorLance(), $maiorEsperado);
+        $this->assertEquals($this->leiloeiro->getMenorLance(), $menorEsperado);
+    }
+
+    
+
+    public function testUltimoLance()
+    {
+        $leilao = new Leilao('Nintendo Switch');
+
+        $renam  = new Usuario('Renam');
+        $caio   = new Usuario('Caio');
+
+        $leilao->propoe(new Lance($caio, 10));
+
+        $leilao->propoe(new Lance($renam, 200));
+        $ultimoLance = $leilao->getUltimoLance();
+        $this->assertEquals($ultimoLance->getValor(), 200);
+    }
 
 
-	public function testMaioresLances(){
+    public function testMaioresLances()
+    {
+        $renam  = new Usuario('Renam');
+        $felipe = new Usuario('Felipe');
+        $construtor = new ConstrutorDeLeilao();
+        
+        $leilao = $construtor->para('Playstation 4')
+            ->lance($renam, 200)
+            ->lance($felipe, 240)
+            ->lance($renam, 300)
+            ->lance($felipe, 500)
+            ->lance($renam, 2000)
+            ->constroi()
+        ;
+        
+        $qntLances = 3;
+        $tresUltimosMaioresLances = $this->leiloeiro->pegarMaioresLances($leilao, $qntLances);
+        $this->assertEquals(count($tresUltimosMaioresLances), $qntLances);
 
-		$leilao = new Leilao('Arvore de Natal');
-
-		$renam 	= new Usuario('Renam');
-		$felipe = new Usuario('Felipe');
-		$caio 	= new Usuario('Caio');
-	
-	
-		$leilao->propoe(new Lance($renam, 500));
-		$leilao->propoe(new Lance($felipe, 200));
-		$leilao->propoe(new Lance($caio, 1000));
-
-		$leiloeiro = new Avaliador();
-		$qntLances = 3;
-		$tresUltimosMaioresLances = $leiloeiro->pegarMaioresLances($leilao, $qntLances);
-		$this->assertEquals(count($tresUltimosMaioresLances), $qntLances);
-
-		$this->assertEquals($tresUltimosMaioresLances[0]->getValor(), 1000);
-		$this->assertEquals($tresUltimosMaioresLances[1]->getValor(), 500);
-		$this->assertEquals($tresUltimosMaioresLances[2]->getValor(), 200);
-	}
+        $this->assertEquals($tresUltimosMaioresLances[0]->getValor(), 2000);
+        $this->assertEquals($tresUltimosMaioresLances[1]->getValor(), 500);
+        $this->assertEquals($tresUltimosMaioresLances[2]->getValor(), 300);
+    }
 
 
-	public function testLanceDuplicado(){
-		try {			
-			$leilao = new Leilao('Arvore de Natal');
+    public function testLanceDuplicado()
+    {
+        try {
+            $leilao = new Leilao('Arvore de Natal');
 
-			$renam 	= new Usuario('Renam');
-			$felipe = new Usuario('Felipe');
-			$caio 	= new Usuario('Caio');		
-		
-			$leilao->propoe(new Lance($renam, 500));
-			$leilao->propoe(new Lance($felipe, 200));			
-			//A Anta do Caio apertou errado o Enter ao digitar... era 1.000 hehe
-			$leilao->propoe(new Lance($caio, 10)); 
-			$leilao->propoe(new Lance($caio, 1000));
+            $renam  = new Usuario('Renam');
+            $felipe = new Usuario('Felipe');
+            $caio   = new Usuario('Caio');
+        
+            $leilao->propoe(new Lance($renam, 500));
+            $leilao->propoe(new Lance($felipe, 200));
+            
+			//A Anta do Caio apertou errado o botão e lançõu 1x um lance de 10 e logo em seguida 1.000 hehe
+            $leilao->propoe(new Lance($caio, 10));
+            $leilao->propoe(new Lance($caio, 1000));
+            
 			//Então deveria estourar o Exception
+        } catch (Exception $exception) {
+            $this->assertInstanceOf('Exception', $exception);
+        }
+    }
 
+	/*
+	//Faz mais sentido interrompoer a execução com um Excpetion
+    public function testLanceMaior5()
+    {
+        try {
+            $leilao = new Leilao('TV 90 Polegada');
+
+            $renam  = new Usuario('Renam');
+            $felipe = new Usuario('Felipe');
 			
-		} catch(Exception $exception){			
-			$this->assertInstanceOf('Exception', $exception);
-		}
-
-	}
-
-	public function testLanceMaior5(){
-		try {			
-			$leilao = new Leilao('TV 90 Polegada');
-
-			$renam 	= new Usuario('Renam');
-			$felipe = new Usuario('Felipe');
-
-			//Competição (Renam x Felipe) hehe
-			$leilao->propoe(new Lance($renam, 50));
-
-			$leilao->propoe(new Lance($felipe, 100));
-			$leilao->propoe(new Lance($renam, 150));
-			$leilao->propoe(new Lance($felipe, 500));			
-			$leilao->propoe(new Lance($renam, 800));			
-			//EITAAA CUZÃO
-			$leilao->propoe(new Lance($felipe, 1000));
-			$leilao->propoe(new Lance($renam, 2000));
-			//print_r('amigou estou aqui');
-			$leilao->propoe(new Lance($felipe, 2500));
-			$leilao->propoe(new Lance($renam, 3000));
-			$leilao->propoe(new Lance($felipe, 3050));
-			$leilao->propoe(new Lance($renam, 3750));
-			$leilao->propoe(new Lance($felipe, 4000));
-
-
-
-			//Foda-se Felipe Wins, maximo de Lances é 5 por pessoas
-			$leilao->propoe(new Lance($renam, 8000));// +8000
-
 			
-		} catch(Exception $exception){			
-			$this->assertInstanceOf('Exception', $exception);
-		}
-
-	}
-
-
-	public function testDobro(){
-		try {			
-			$leilao = new Leilao('TV 90 Polegada');
-			$renam 	= new Usuario('Renam');
-			$felipe = new Usuario('Felipe');
+            //Competição (Renam x Felipe) hehe
+			$construtor = new ConstrutorDeLeilao();
+			$leilao = $construtor->para('TV 90 Polegada')
+				->lance($renam , 50)
+				->lance($felipe, 
+				->lance($renam , 100)
+				->lance($felipe, 150)
+				->lance($renam , 500)
+				->lance($felipe, 800)
+				->lance($renam , 802)
+				//EITAAA CUZÃO
+				->lance($felipe, 1000)
+				->lance($renam , 2000)
+				->lance($felipe, 2002)
+				->lance($renam , 2500)
+				->lance($felipe, 3000)
+				->lance($renam , 3050)
+				->lance($felipe, 3750)
+				->lance($renam , 4000)				
+				//Felipe says: "N vai da não.."
+				->constroi()
+			;
 			
-			//Competição (Renam x Felipe) hehe
-			$leilao->propoe(new Lance($renam, 50));
-
-			$leilao->propoe(new Lance($felipe, 100));
-			$leilao->propoe(new Lance($renam, 150));
-			$leilao->propoe(new Lance($felipe, 500));			
-			$leilao->propoe(new Lance($renam, 800));			
-			//EITAAA CUZÃO
-			$leilao->propoe(new Lance($felipe, 1000));
-			$leilao->propoe(new Lance($renam, 2000));			
-			$leilao->propoe(new Lance($felipe, 2500));
-			$leilao->propoe(new Lance($renam, 3000));
-			$leilao->propoe(new Lance($felipe, 3050));
-			$leilao->propoe(new Lance($renam, 3750));
-
-			//Take DOUBLE KILL, TRIPLE KILL DO MicaO, 
-			//QUADRA NÃO, QUADRA NÃO?! É TETRA!!! TETRAAAAAA KILL!!
-			$leilao->dobraLance($felipe);
-
-			$leiloeiro = new Avaliador();
-			$lances = $leiloeiro->pegarMaioresLances($leilao, 1);			
-			$this->assertEquals($lances[0]->getValor(), 3050 * 2);
-
-		} catch(Exception $exception){			
-			//$this->assertInstanceOf('Exception', $exception);
-			print $exception->getMessage();
-		}
-
-	}
-
-	public function testDobroVoid(){
-		try {			
-			$leilao = new Leilao('TV 90 Polegada');
-			$renam 	= new Usuario('Renam');
-			$felipe = new Usuario('Felipe');
-			
-			$leilao->propoe(new Lance($renam, 50));
-			//$leilao->propoe(new Lance($felipe, 100));
-			$leilao->dobraLance($felipe);
-
-			$leiloeiro = new Avaliador();
-			$lances = $leiloeiro->pegarMaioresLances($leilao, 1);			
-
-			//Deve ignorar a entrada o dobro do $felipe afinalo dobro de void é void² ^^
-			$this->assertEquals($lances[0]->getValor(), 50);
-
-		} catch(Exception $exception){			
-			//$this->assertInstanceOf('Exception', $exception);
-			print $exception->getMessage();
-		}
-
-	}
-	
+            
+        } catch (Exception $exception) {
+            $this->assertInstanceOf('Exception', $exception);
+        }
+    }
+	*/
 
 
-	
+    public function testDobro()
+    {
+        try {
+            $leilao = new Leilao('TV 90 Polegada');
+            $renam  = new Usuario('Renam');
+            $felipe = new Usuario('Felipe');
+            
+            //Competição (Renam x Felipe) hehe
+            $leilao->propoe(new Lance($renam, 50));
 
+            $leilao->propoe(new Lance($felipe, 100));
+            $leilao->propoe(new Lance($renam, 150));
+            $leilao->propoe(new Lance($felipe, 500));
+            $leilao->propoe(new Lance($renam, 800));
+            //EITAAA CUZÃO
+            $leilao->propoe(new Lance($felipe, 1000));
+            $leilao->propoe(new Lance($renam, 2000));
+            $leilao->propoe(new Lance($felipe, 2500));
+            $leilao->propoe(new Lance($renam, 3000));
+            $leilao->propoe(new Lance($felipe, 3050));
+            $leilao->propoe(new Lance($renam, 3750));
+
+            //Take DOUBLE KILL, TRIPLE KILL DO MicaO,
+            //QUADRA NÃO, QUADRA NÃO?! É TETRA!!! TETRAAAAAA KILL!!
+            $leilao->dobraLance($felipe);
+
+            
+            $lances = $this->leiloeiro->pegarMaioresLances($leilao, 1);
+            $this->assertEquals($lances[0]->getValor(), 3050 * 2);
+        } catch (Exception $exception) {
+            //$this->assertInstanceOf('Exception', $exception);
+            print $exception->getMessage();
+        }
+    }
+
+    public function testDobroVoid()
+    {
+        try {
+            $leilao = new Leilao('TV 90 Polegada');
+            $renam  = new Usuario('Renam');
+            $felipe = new Usuario('Felipe');
+            
+            $leilao->propoe(new Lance($renam, 50));
+            //$leilao->propoe(new Lance($felipe, 100));
+            $leilao->dobraLance($felipe);
+
+            
+            $lances = $this->leiloeiro->pegarMaioresLances($leilao, 1);
+
+            //Deve ignorar a entrada o dobro do $felipe afinalo dobro de void é void² ^^
+            $this->assertEquals($lances[0]->getValor(), 50);
+        } catch (Exception $exception) {
+            //$this->assertInstanceOf('Exception', $exception);
+            print $exception->getMessage();
+        }
+    }
+    
+    
+    /**
+    * @expectedException InvalidArgumentException
+    */
+    public function testDeveRecusarLeilaoSemLances()
+    {
+                
+        $construtor = new ConstrutorDeLeilao();
+    
+        $leilao = $construtor->para('Playstation 4')
+            //->lance($renam, 200)
+            ->constroi()
+        ;
+
+        $this->leiloeiro->avalia($leilao);
+        
+        $this->assertTrue(false);
+    }
 }

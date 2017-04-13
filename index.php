@@ -7,12 +7,38 @@ $x=  array_slice($arr, 2);
 var_dump($x);
 die();
 */
-
 require_once 'config.php';
 
 
-try {
-	/*
+
+$leilao = new Leilao('Playstation 4');
+
+$renam  = new Usuario('Renam');
+$caio   = new Usuario('Caio');
+$felipe = new Usuario('Felipe');
+
+
+//$leilao->propoe(new Lance($renam, 5));
+///$leilao->propoe(new Lance($caio, 5));
+//$leilao->propoe(new Lance($felipe, 5));
+
+$construtor = new ConstrutorDeLeilao();
+$leilao = $construtor->para('Playstation 4')
+    ->lance($renam, 5)
+    //->lance($caio, 5)
+    //->lance($felipe, 5)
+    ->constroi()
+;
+
+//print_r($leilao);die();
+$leiloeiro = new Avaliador();
+$leiloeiro->avalia($leilao);
+
+
+
+
+//try {
+    /*
 
 	$leilao = new Leilao('Arvore de Natal');
 
@@ -29,7 +55,7 @@ try {
 	//var_dump($ultimoLance);
 	//die();
 	*/
-	/*
+    /*
 	$leilao = new Leilao('TV 90 Polegada');
 
 	$renam 	= new Usuario('Renam');
@@ -61,9 +87,11 @@ try {
 	$lances = $leiloeiro->pegarMaioresLances($leilao, 3);
 	var_dump($lances);
 	*/
+    /*
 
+	try {
 
-	try {			
+		
 		$leilao = new Leilao('TV 90 Polegada');
 		$renam 	= new Usuario('Renam');
 		$felipe = new Usuario('Felipe');
@@ -81,8 +109,9 @@ try {
 		//$this->assertInstanceOf('Exception', $exception);
 		print $exception->getMessage();
 	}
+	*/
 
 
-} catch(Exception $exception){
-	print $exception->getMessage();
-}
+//} catch(Exception $exception){
+    //print $exception->getMessage();
+//}
