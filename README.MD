@@ -27,7 +27,7 @@ Saida:
 ```
 
 
-### Alguns Atividades:  
+### Atividades:  
 
 Um leilão não deve aceitar: - 2 lances em sequência dado pelo mesmo usuário; - Um mesmo usuário não pode dar mais do que 5 lances no mesmo leilão;  
 
